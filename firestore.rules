@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper to check if the user is accessing their own document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Users collection:
+    // - Read: Authenticated users can read (to fetch profiles)
+    // - Write: Users can only write their own document
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // Folders implementation: Shared resource
+    // - Read/Write: Allowed for any authenticated user
+    match /folders/{folderId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Files implementation: Shared resource
+    // - Read/Write: Allowed for any authenticated user
+    match /files/{fileId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

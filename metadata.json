@@ -1,0 +1,5 @@
+{
+  "name": "サンプルナレッジベース",
+  "description": "An intelligent knowledge base application that allows users to upload and organize PDF and 3D files. It uses Gemini to understand document content, enabling users to search for information and chat with an AI assistant that answers questions based on the uploaded knowledge.",
+  "requestFramePermissions": []
+}
