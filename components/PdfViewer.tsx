@@ -19,6 +19,7 @@ interface PdfViewerProps {
 
 export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onDelete, showBackButton, onBackToSearch, userProfile, onFileRescan, isRescanning, rescanProgress }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [numPages, setNumPages] = useState(0);
@@ -50,6 +51,27 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       // No cleanup needed for URLs
     }
   }, [file.url, initialPage]);
+
+  // Auto-fit to width when PDF loads
+  useEffect(() => {
+    const fitToWidth = async () => {
+      if (!pdfDoc || !containerRef.current) return;
+      try {
+        const page = await pdfDoc.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        const containerWidth = containerRef.current.clientWidth;
+        // Subtract padding (p-4 = 32px approx) + extra margin
+        const availableWidth = containerWidth - 48;
+        if (availableWidth > 0 && viewport.width > 0) {
+          const scale = availableWidth / viewport.width;
+          setZoom(scale);
+        }
+      } catch (e) {
+        console.error("Auto-fit failed", e);
+      }
+    };
+    fitToWidth();
+  }, [pdfDoc]);
 
   const renderPage = useCallback(async () => {
     if (!pdfDoc || !canvasRef.current) return;
@@ -162,7 +184,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       <div className="flex-shrink-0 bg-gray-50 p-2 text-center border-b border-gray-200">
         {getOcrStatus()}
       </div>
-      <div className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
+      <div ref={containerRef} className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
         {error ? (
           <div className="text-red-500 flex items-center justify-center h-full bg-white rounded-lg p-6 shadow-sm">{error}</div>
         ) : (
