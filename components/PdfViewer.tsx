@@ -45,7 +45,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       }
     };
     loadPdf();
-    
+
     return () => {
       // No cleanup needed for URLs
     }
@@ -60,16 +60,16 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       const viewport = page.getViewport({ scale: zoom });
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
-      
+
       canvas.height = viewport.height;
       canvas.width = viewport.width;
 
-      if(context){
+      if (context) {
         await page.render({ canvasContext: context, viewport: viewport }).promise;
       }
     } catch (e) {
-        console.error("Failed to render page:", e);
-        setError(`ページ ${currentPage} の描画に失敗しました。`);
+      console.error("Failed to render page:", e);
+      setError(`ページ ${currentPage} の描画に失敗しました。`);
     }
     setIsRendering(false);
   }, [pdfDoc, currentPage, zoom]);
@@ -77,103 +77,103 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
   useEffect(() => {
     renderPage();
   }, [renderPage]);
-  
+
   const goToPage = (pageNumber: number) => {
     setCurrentPage(Math.max(1, Math.min(pageNumber, numPages)));
   }
 
   const getOcrStatus = () => {
-      if (isRescanning) {
-          return <span className="text-sm text-sky-600 animate-pulse">{rescanProgress}</span>;
-      }
-      switch (file.ocrStatus) {
-          case 'ocr_applied':
-              const date = file.lastOcrScan?.seconds ? new Date(file.lastOcrScan.seconds * 1000).toLocaleDateString('ja-JP') : '';
-              return <span className="text-sm text-green-600 font-medium" title={`最終スキャン: ${date}`}>テキスト認識: OCR適用済み</span>;
-          case 'ocr_recommended':
-              return <span className="text-sm text-amber-600 font-medium" title="このPDFは画像が主体のようです。検索精度を向上させるためにOCRスキャンを推奨します。">テキスト認識: OCR推奨</span>;
-          case 'text_only':
-              return <span className="text-sm text-gray-500">テキスト認識: 抽出済み</span>;
-          default:
-              return <span className="text-sm text-gray-400">テキスト認識: 不明</span>;
-      }
+    if (isRescanning) {
+      return <span className="text-sm text-sky-600 animate-pulse">{rescanProgress}</span>;
+    }
+    switch (file.ocrStatus) {
+      case 'ocr_applied':
+        const date = file.lastOcrScan?.seconds ? new Date(file.lastOcrScan.seconds * 1000).toLocaleDateString('ja-JP') : '';
+        return <span className="text-sm text-green-600 font-medium" title={`最終スキャン: ${date}`}>テキスト認識: OCR適用済み</span>;
+      case 'ocr_recommended':
+        return <span className="text-sm text-amber-600 font-medium" title="このPDFは画像が主体のようです。検索精度を向上させるためにOCRスキャンを推奨します。">テキスト認識: OCR推奨</span>;
+      case 'text_only':
+        return <span className="text-sm text-gray-500">テキスト認識: 抽出済み</span>;
+      default:
+        return <span className="text-sm text-gray-400">テキスト認識: 不明</span>;
+    }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
-        <div className="flex-shrink-0 bg-white border-b border-gray-200 rounded-t-lg p-2 flex items-center justify-between gap-4 sticky top-0 z-10">
-            <div className="flex items-center gap-2 w-1/3">
-                {showBackButton && onBackToSearch && (
-                    <button 
-                        onClick={onBackToSearch} 
-                        className="flex items-center gap-2 py-2 px-3 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" 
-                        title="検索結果に戻る"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5" />
-                        <span>戻る</span>
-                    </button>
-                )}
-            </div>
-
-            <div className="flex items-center justify-center gap-4">
-                 <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                    <ChevronLeftIcon className="w-5 h-5" />
-                 </button>
-                 <span className="font-semibold text-gray-700 whitespace-nowrap">
-                     ページ {currentPage} / {numPages || '--'}
-                 </span>
-                 <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= numPages || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                    <ChevronRightIcon className="w-5 h-5" />
-                 </button>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 w-1/3">
-                 <button onClick={() => setZoom(z => z - 0.2)} disabled={zoom < 0.5 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                    <ZoomOutIcon className="w-5 h-5" />
-                 </button>
-                  <span className="font-semibold text-gray-700 w-16 text-center">
-                     {(zoom * 100).toFixed(0)}%
-                 </span>
-                 <button onClick={() => setZoom(z => z + 0.2)} disabled={zoom > 3 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                    <ZoomInIcon className="w-5 h-5" />
-                 </button>
-                 <div className="h-6 w-px bg-gray-300 mx-2"></div>
-                {file.isLocked && <LockIcon className="w-5 h-5 text-yellow-500" title="このファイルはロックされています" />}
-                <button 
-                    onClick={onFileRescan}
-                    disabled={isRescanning || file.isLocked}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-sky-100 text-gray-500 hover:text-sky-600 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-                    title={file.isLocked ? "ファイルがロックされています" : "再スキャンしてテキストを最適化"}
-                >
-                    {isRescanning ? <LoadingSpinner className="w-5 h-5 text-sky-600" /> : <ScanIcon className="w-5 h-5" />}
-                </button>
-                <button 
-                    onClick={onDelete} 
-                    className="p-2 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed" 
-                    title={file.isLocked ? "ファイルがロックされています" : "ファイルを削除"}
-                    disabled={file.isLocked || isRescanning}
-                >
-                    <TrashIcon className="w-5 h-5" />
-                </button>
-            </div>
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 rounded-t-lg p-2 flex items-center justify-between gap-4 sticky top-0 z-10">
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          {showBackButton && onBackToSearch && (
+            <button
+              onClick={onBackToSearch}
+              className="flex items-center gap-2 py-2 px-3 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors whitespace-nowrap"
+              title="検索結果に戻る"
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">戻る</span>
+            </button>
+          )}
         </div>
-        <div className="flex-shrink-0 bg-gray-50 p-2 text-center border-b border-gray-200">
-            {getOcrStatus()}
+
+        <div className="flex items-center justify-center gap-4">
+          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <ChevronLeftIcon className="w-5 h-5" />
+          </button>
+          <span className="font-semibold text-gray-700 whitespace-nowrap">
+            ページ {currentPage} / {numPages || '--'}
+          </span>
+          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= numPages || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <ChevronRightIcon className="w-5 h-5" />
+          </button>
         </div>
-        <div className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
-            {error ? (
-                 <div className="text-red-500 flex items-center justify-center h-full bg-white rounded-lg p-6 shadow-sm">{error}</div>
-            ) : (
-                <div className="relative">
-                    {(isRendering || isRescanning) && (
-                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20 backdrop-blur-sm">
-                            <LoadingSpinner className="text-sky-600 w-10 h-10" />
-                        </div>
-                    )}
-                    <canvas ref={canvasRef} className="rounded-md shadow-lg" />
-                </div>
+
+        <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
+          <button onClick={() => setZoom(z => z - 0.2)} disabled={zoom < 0.5 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <ZoomOutIcon className="w-5 h-5" />
+          </button>
+          <span className="font-semibold text-gray-700 w-16 text-center">
+            {(zoom * 100).toFixed(0)}%
+          </span>
+          <button onClick={() => setZoom(z => z + 0.2)} disabled={zoom > 3 || isRescanning} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <ZoomInIcon className="w-5 h-5" />
+          </button>
+          <div className="h-6 w-px bg-gray-300 mx-2"></div>
+          {file.isLocked && <LockIcon className="w-5 h-5 text-yellow-500" title="このファイルはロックされています" />}
+          <button
+            onClick={onFileRescan}
+            disabled={isRescanning || file.isLocked}
+            className="p-2 rounded-full bg-gray-100 hover:bg-sky-100 text-gray-500 hover:text-sky-600 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            title={file.isLocked ? "ファイルがロックされています" : "再スキャンしてテキストを最適化"}
+          >
+            {isRescanning ? <LoadingSpinner className="w-5 h-5 text-sky-600" /> : <ScanIcon className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-2 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            title={file.isLocked ? "ファイルがロックされています" : "ファイルを削除"}
+            disabled={file.isLocked || isRescanning}
+          >
+            <TrashIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      <div className="flex-shrink-0 bg-gray-50 p-2 text-center border-b border-gray-200">
+        {getOcrStatus()}
+      </div>
+      <div className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
+        {error ? (
+          <div className="text-red-500 flex items-center justify-center h-full bg-white rounded-lg p-6 shadow-sm">{error}</div>
+        ) : (
+          <div className="relative">
+            {(isRendering || isRescanning) && (
+              <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20 backdrop-blur-sm">
+                <LoadingSpinner className="text-sky-600 w-10 h-10" />
+              </div>
             )}
-        </div>
+            <canvas ref={canvasRef} className="rounded-md shadow-lg" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
