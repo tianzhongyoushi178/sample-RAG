@@ -36,8 +36,10 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       setError(null);
       setPdfDoc(null);
       try {
-        // Use local proxy to bypass CORS
-        const proxyUrl = `/api/proxy?url=${encodeURIComponent(file.url)}`;
+        // Use local proxy to bypass CORS for remote URLs, but use direct blob for local
+        const isBlob = file.url.startsWith('blob:');
+        const proxyUrl = isBlob ? file.url : `/api/proxy?url=${encodeURIComponent(file.url)}`;
+
         const doc = await pdfjsLib.getDocument(proxyUrl).promise;
         setPdfDoc(doc);
         setNumPages(doc.numPages);

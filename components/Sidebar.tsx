@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { KnowledgeFile, Folder, FilteredFileResult, UserProfile } from '../types';
-import { FolderIcon, FileIcon, FolderPlusIcon, UploadIcon, FolderUploadIcon, TrashIcon, LockIcon, UnlockIcon, SearchIcon, XIcon, UserIcon, AdminIcon, ChevronRightIcon, ChevronDownIcon } from './Icons';
+import { FolderIcon, FileIcon, FolderPlusIcon, UploadIcon, FolderUploadIcon, TrashIcon, LockIcon, UnlockIcon, SearchIcon, XIcon, UserIcon, AdminIcon, ChevronRightIcon, ChevronDownIcon, CloudIcon, CloudOffIcon } from './Icons';
 import { Logo } from './Logo';
 
 interface SidebarProps {
@@ -231,6 +231,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-full h-full bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
       <div className="flex-shrink-0 py-4 border-b border-gray-100">
         <Logo />
+        {/* Connection Status Indicator */}
+        <div className="px-4 mt-2 flex items-center gap-2 text-xs text-gray-400">
+          {import.meta.env.VITE_FIREBASE_API_KEY ? (
+            <>
+              <CloudIcon className="w-3 h-3 text-green-500" />
+              <span>Online (Firebase)</span>
+            </>
+          ) : (
+            <>
+              <CloudOffIcon className="w-3 h-3 text-orange-500" />
+              <span>Offline (Local Mode)</span>
+            </>
+          )}
+        </div>
       </div>
       {/* Action Buttons */}
       <div className="p-4 flex-shrink-0 border-b border-gray-200 bg-gray-50/50">
