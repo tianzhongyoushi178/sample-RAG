@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { KnowledgeFile, Folder, FilteredFileResult, UserProfile } from '../types';
-import { FolderIcon, FileIcon, FolderPlusIcon, UploadIcon, FolderUploadIcon, TrashIcon, LockIcon, UnlockIcon, SearchIcon, XIcon, UserIcon, AdminIcon, ChevronRightIcon, ChevronDownIcon, CloudIcon, CloudOffIcon } from './Icons';
+import { FolderIcon, FileIcon, FolderPlusIcon, UploadIcon, FolderUploadIcon, TrashIcon, LockIcon, UnlockIcon, SearchIcon, XIcon, UserIcon, AdminIcon, ChevronRightIcon, ChevronDownIcon, CloudIcon, CloudOffIcon, InfoIcon } from './Icons';
 import { Logo } from './Logo';
 
 interface SidebarProps {
