@@ -58,10 +58,26 @@ export const Manual: React.FC<ManualProps> = ({ onClose }) => {
                         </div>
                     </section>
 
-                    {/* Section 3: Chat */}
+
+                    {/* Section 3: Search */}
                     <section className="flex flex-col md:flex-row items-center gap-8">
                         <div className="flex-1 space-y-4">
                             <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-sky-100 text-sky-600 font-bold text-lg">3</div>
+                            <h3 className="text-xl font-bold text-gray-800">資料の中身を検索する</h3>
+                            <p className="text-gray-600 leading-relaxed">
+                                サイドバーの検索窓にキーワードを入れると、すべてのPDFファイルの中から関連する箇所を瞬時に探し出します。<br />
+                                ファイル名だけでなく、資料の中身のテキストまで検索対象になるので、大量の資料から目的の情報を見つけるのに便利です。
+                            </p>
+                        </div>
+                        <div className="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm transition-transform hover:scale-[1.02] duration-300">
+                            <img src="/images/manual_search.png" alt="Search Illustration" className="w-full h-auto object-contain" />
+                        </div>
+                    </section>
+
+                    {/* Section 4: Chat */}
+                    <section className="flex flex-col md:flex-row-reverse items-center gap-8">
+                        <div className="flex-1 space-y-4">
+                            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-sky-100 text-sky-600 font-bold text-lg">4</div>
                             <h3 className="text-xl font-bold text-gray-800">AIと会話する</h3>
                             <p className="text-gray-600 leading-relaxed">
                                 「この資料の要約は？」「〇〇について教えて」とチャットで質問してみましょう。<br />
