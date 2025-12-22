@@ -24,6 +24,7 @@ interface SidebarProps {
   onLogout: () => void;
   userProfile: UserProfile | null;
   onSwitchToAdmin?: () => void; // Optional now, effectively unused
+  onOpenManual: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -46,6 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userEmail,
   onLogout,
   userProfile,
+  onOpenManual,
 }) => {
   const [newFolderName, setNewFolderName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -385,6 +387,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* User Info & Logout */}
       <div className="p-4 border-t border-gray-200 flex-shrink-0 space-y-3 bg-gray-50/50">
+        <button
+          onClick={onOpenManual}
+          className="w-full flex items-center justify-center gap-2 text-sky-600 bg-white border border-sky-200 hover:bg-sky-50 font-medium py-2 px-4 rounded-md transition-colors shadow-sm"
+        >
+          <InfoIcon className="w-5 h-5" />
+          <span>使い方を見る</span>
+        </button>
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 truncate">
             <UserIcon className="w-6 h-6 p-1 bg-gray-200 text-gray-600 rounded-full flex-shrink-0" />
