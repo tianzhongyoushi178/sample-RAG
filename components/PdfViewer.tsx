@@ -40,7 +40,11 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
         const isBlob = file.url.startsWith('blob:');
         const proxyUrl = isBlob ? file.url : `/api/proxy?url=${encodeURIComponent(file.url)}`;
 
-        const doc = await pdfjsLib.getDocument(proxyUrl).promise;
+        const doc = await pdfjsLib.getDocument({
+          url: proxyUrl,
+          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+          cMapPacked: true,
+        }).promise;
         setPdfDoc(doc);
         setNumPages(doc.numPages);
         setCurrentPage(Math.min(initialPage, doc.numPages));
