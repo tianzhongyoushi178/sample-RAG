@@ -231,17 +231,35 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       <div className="flex-shrink-0 bg-gray-50 p-2 text-center border-b border-gray-200">
         {getOcrStatus()}
       </div>
-      <div ref={containerRef} className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
+      <div ref={containerRef} className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100 relative">
         {error ? (
-          <div className="text-red-500 flex items-center justify-center h-full bg-white rounded-lg p-6 shadow-sm">{error}</div>
+          <div className="flex flex-col items-center justify-center h-full text-center p-6">
+            <div className="text-red-500 bg-white rounded-lg p-6 shadow-sm mb-4 max-w-md">
+              <p className="font-bold mb-2">表示エラー</p>
+              <p className="text-sm mb-4">{error}</p>
+              <div className="text-xs text-gray-400 bg-gray-50 p-2 rounded text-left overflow-auto max-h-32 mb-4 font-mono">
+                Details: {JSON.stringify(error)}
+              </div>
+            </div>
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-sky-600 hover:bg-sky-500 text-white py-2 px-4 rounded-md transition-colors"
+              download={file.name}
+            >
+              <DownloadIcon className="w-4 h-4" />
+              ファイルを直接ダウンロード/表示
+            </a>
+          </div>
         ) : (
-          <div className="relative">
+          <div className="relative shadow-lg">
             {(isRendering || isRescanning) && (
-              <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-20 backdrop-blur-sm rounded-md">
                 <LoadingSpinner className="text-sky-600 w-10 h-10" />
               </div>
             )}
-            <canvas ref={canvasRef} className="rounded-md shadow-lg" />
+            <canvas ref={canvasRef} className="rounded-md bg-white min-h-[400px]" />
           </div>
         )}
       </div>
