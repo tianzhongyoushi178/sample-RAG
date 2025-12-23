@@ -84,9 +84,23 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
   const renderPage = useCallback(async () => {
     if (!pdfDoc || !canvasRef.current) return;
 
+    // Cancel previous render if possible (by checking current render ID or flag)
+    // Since we can't easily cancel proper promises without abort controller support in PDF.js (partially supported),
+    // we use a flag to ignore obsolete results.
+    const renderId = Date.now();
+    // @ts-ignore - custom property for cancellation
+    canvasRef.current._renderId = renderId;
+
     setIsRendering(true);
+    setError(null);
+
     try {
       const page = await pdfDoc.getPage(currentPage);
+
+      // If another render started, abort
+      // @ts-ignore
+      if (canvasRef.current._renderId !== renderId) return;
+
       const viewport = page.getViewport({ scale: zoom });
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
@@ -95,13 +109,38 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
       canvas.width = viewport.width;
 
       if (context) {
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+        const renderTask = page.render(renderContext);
+
+        // Store render task to cancel if needed
+        // @ts-ignore
+        canvas._renderTask = renderTask;
+
+        try {
+          await renderTask.promise;
+        } catch (renderError: any) {
+          if (renderError?.name === 'RenderingCancelledException') {
+            // Ignore cancellation errors
+            return;
+          }
+          throw renderError;
+        }
       }
-    } catch (e) {
+    } catch (e: any) {
+      // @ts-ignore
+      if (canvasRef.current?._renderId !== renderId) return; // Ignore if obsolete
+
       console.error("Failed to render page:", e);
       setError(`ページ ${currentPage} の描画に失敗しました。`);
+    } finally {
+      // @ts-ignore
+      if (canvasRef.current?._renderId === renderId) {
+        setIsRendering(false);
+      }
     }
-    setIsRendering(false);
   }, [pdfDoc, currentPage, zoom]);
 
   useEffect(() => {
