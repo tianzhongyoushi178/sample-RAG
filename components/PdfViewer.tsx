@@ -84,9 +84,17 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({ file, initialPage = 1, onD
   const renderPage = useCallback(async () => {
     if (!pdfDoc || !canvasRef.current) return;
 
-    // Cancel previous render if possible (by checking current render ID or flag)
-    // Since we can't easily cancel proper promises without abort controller support in PDF.js (partially supported),
-    // we use a flag to ignore obsolete results.
+    // Cancel previous render task if it exists
+    // @ts-ignore
+    if (canvasRef.current?._renderTask) {
+      try {
+        // @ts-ignore
+        await canvasRef.current._renderTask.cancel();
+      } catch (e) {
+        // Ignore cancellation errors, they are expected
+      }
+    }
+
     const renderId = Date.now();
     // @ts-ignore - custom property for cancellation
     canvasRef.current._renderId = renderId;
