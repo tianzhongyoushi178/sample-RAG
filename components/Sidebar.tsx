@@ -255,7 +255,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <UploadIcon className="w-4 h-4 text-gray-500" />
             ファイル
           </button>
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept=".pdf,.demo3d,.png,.jpg,.jpeg,.webp" />
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" />
 
           <button onClick={handleFolderUploadClick} className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 px-3 rounded-md transition-colors text-sm shadow-sm" title="フォルダをアップロード">
             <FolderUploadIcon className="w-4 h-4 text-gray-500" />

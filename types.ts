@@ -19,14 +19,14 @@ export interface Folder {
 }
 
 export interface KnowledgeFileContent {
-    name: string; // e.g., "Page 1" or "Sheet Name"
-    text: string;
+  name: string; // e.g., "Page 1" or "Sheet Name"
+  text: string;
 }
 
 export interface KnowledgeFile {
-  id:string;
+  id: string;
   name: string;
-  type: 'pdf' | 'demo3d' | 'image';
+  type: 'pdf' | 'image';
   url?: string; // Firebase Storage URL
   folderId: string;
   content?: KnowledgeFileContent[]; // Extracted text per page for PDFs or per sheet for Excel
@@ -39,10 +39,10 @@ export interface KnowledgeFile {
 }
 
 export interface ChatMessageSource {
-    documentName: string;
-    text: string;
-    fileId: string;
-    location: string;
+  documentName: string;
+  text: string;
+  fileId: string;
+  location: string;
 }
 
 export interface ChatMessage {

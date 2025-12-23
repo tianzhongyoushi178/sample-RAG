@@ -6,7 +6,7 @@ export const FolderIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export const FileIcon: React.FC<React.SVGProps<SVGSVGElement> & { type: 'pdf' | 'demo3d' | 'image' }> = ({ type, ...props }) => {
+export const FileIcon: React.FC<React.SVGProps<SVGSVGElement> & { type: 'pdf' | 'image' }> = ({ type, ...props }) => {
   let color = '#475569'; // slate-600 default for light mode
   if (type === 'pdf') color = '#dc2626'; // red-600
   if (type === 'demo3d') color = '#2563eb'; // blue-600

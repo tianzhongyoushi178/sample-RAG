@@ -472,11 +472,7 @@ export const syncStorageToFirestore = async (): Promise<{ synced: number; skippe
                                 content: content, contentLength: content.reduce((acc, val) => acc + val.text.length, 0),
                                 isLocked: false, storagePath: itemPath, ocrStatus: ocrStatus,
                             };
-                        } else if (itemName.toLowerCase().endsWith('.demo3d')) {
-                            newFileMetadata = {
-                                id: newId, name: itemName, type: 'demo3d', folderId: 'root',
-                                content: [], contentLength: 0, isLocked: false, storagePath: itemPath,
-                            };
+
                         } else {
                             stats.skipped++;
                             continue;

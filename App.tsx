@@ -208,11 +208,6 @@ const App: React.FC = () => {
             ocrStatus: ocrStatus
           };
           return await firebase.uploadAndSaveFile(file, metadata);
-        } else if (file.name.toLowerCase().endsWith('.demo3d')) {
-          const metadata: Omit<KnowledgeFile, 'url'> = {
-            id: generateId(), name: file.name, type: 'demo3d', folderId, content: [], contentLength: 0, isLocked: false,
-          };
-          return await firebase.uploadAndSaveFile(file, metadata);
         } else if (file.type.startsWith('image/')) {
           const base64 = await fileToBase64(file);
           const ocrText = await ocrImage(base64, file.type);
