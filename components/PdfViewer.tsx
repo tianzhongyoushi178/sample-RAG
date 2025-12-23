@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, ZoomOutIcon, LoadingSpinner, TrashIcon, LockIcon, ScanIcon } from './Icons';
+import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, ZoomInIcon, ZoomOutIcon, LoadingSpinner, TrashIcon, LockIcon, ScanIcon, DownloadIcon } from './Icons';
 import type { KnowledgeFile, UserProfile } from '../types';
 
 // pdfjsLib is loaded from a CDN in index.html
