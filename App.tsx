@@ -5,8 +5,8 @@ import { Sidebar } from './components/Sidebar';
 import { MainContent } from './components/MainContent';
 import { ChatWidget } from './components/ChatWidget';
 import { Manual } from './components/Manual';
-import { answerFromKnowledgeBase, ocrImage } from './services/geminiService';
-import { extractTextFromPdf } from './services/pdfUtils';
+import { answerFromKnowledgeBase } from './services/geminiService';
+import { extractTextFromFile } from './services/fileUtils';
 import * as firebase from './services/firebaseService';
 import { LoadingSpinner, InfoIcon, UploadIcon, FolderIcon, BotIcon } from './components/Icons';
 
@@ -200,40 +200,29 @@ const App: React.FC = () => {
   const processAndSaveFiles = useCallback(async (filesToProcess: { file: File, folderId: string }[]) => {
     const processAndUploadFile = async (file: File, folderId: string): Promise<KnowledgeFile | null> => {
       try {
-        if (file.type === 'application/pdf') {
-          const { content, ocrStatus } = await extractTextFromPdf(file);
-          const metadata: Omit<KnowledgeFile, 'url'> = {
-            id: generateId(), name: file.name, type: 'pdf', folderId, content,
-            contentLength: content.reduce((acc, val) => acc + val.text.length, 0), isLocked: false,
-            ocrStatus: ocrStatus
-          };
-          return await firebase.uploadAndSaveFile(file, metadata);
-        } else if (file.type.startsWith('image/')) {
-          const base64 = await fileToBase64(file);
-          const ocrText = await ocrImage(base64, file.type);
-          const content = [{ name: 'Image Content', text: ocrText }];
+        const { content, ocrStatus, contentLength } = await extractTextFromFile(file);
 
-          const metadata: Omit<KnowledgeFile, 'url'> = {
-            id: generateId(),
-            name: file.name,
-            type: 'image',
-            folderId,
-            content,
-            contentLength: ocrText.length,
-            isLocked: false,
-            ocrStatus: 'ocr_applied',
-            lastOcrScan: { seconds: Math.floor(Date.now() / 1000) }
-          };
-          return await firebase.uploadAndSaveFile(file, metadata);
-        } else {
-          if (filesToProcess.length <= 1) {
-            alert(`サポートされていないファイル形式です: ${file.name}`);
-          }
-          return null;
-        }
-      } catch (error: unknown) {
+        let fileType: 'pdf' | 'image' | 'text' | 'docx' = 'text';
+        if (file.name.toLowerCase().endsWith('.pdf')) fileType = 'pdf';
+        else if (file.type.startsWith('image/')) fileType = 'image';
+        else if (file.name.toLowerCase().endsWith('.docx')) fileType = 'docx';
+
+        const metadata: Omit<KnowledgeFile, 'url'> = {
+          id: generateId(),
+          name: file.name,
+          type: fileType,
+          folderId,
+          content,
+          contentLength,
+          isLocked: false,
+          ocrStatus,
+          ...(ocrStatus === 'ocr_applied' ? { lastOcrScan: { seconds: Math.floor(Date.now() / 1000) } } : {})
+        };
+
+        return await firebase.uploadAndSaveFile(file, metadata);
+      } catch (error: any) {
         console.error(`Failed to process or upload ${file.name}:`, error);
-        alert(`ファイル「${file.name}」の処理またはアップロードに失敗しました。`);
+        alert(`ファイル「${file.name}」の処理またはアップロードに失敗しました。\n詳細: ${error.message}`);
         return null;
       }
     };
@@ -629,7 +618,7 @@ const App: React.FC = () => {
               file,
               snippet: contentSnippet,
               location: contentItem.name,
-              folderName: folderNameMap.get(file.folderId)
+              folderName: folderNameMap.get(file.folderId) as string
             });
           }
         }
@@ -653,7 +642,7 @@ const App: React.FC = () => {
           id: file.id,
           file,
           snippet: snippet,
-          folderName: folderNameMap.get(file.folderId)
+          folderName: folderNameMap.get(file.folderId) as string
         });
       }
     }

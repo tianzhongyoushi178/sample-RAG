@@ -26,7 +26,7 @@ export interface KnowledgeFileContent {
 export interface KnowledgeFile {
   id: string;
   name: string;
-  type: 'pdf' | 'image';
+  type: 'pdf' | 'image' | 'text' | 'docx';
   url?: string; // Firebase Storage URL
   folderId: string;
   content?: KnowledgeFileContent[]; // Extracted text per page for PDFs or per sheet for Excel

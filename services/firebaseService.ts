@@ -38,6 +38,7 @@ import {
 
 import type { Folder, KnowledgeFile, UserProfile, UserStatus } from '../types';
 import { extractTextFromPdfUrl, rescanPdfWithOcrGenerator } from './pdfUtils';
+import { extractTextFromDocx } from './wordUtils';
 
 
 // Firebase configuration
@@ -472,7 +473,26 @@ export const syncStorageToFirestore = async (): Promise<{ synced: number; skippe
                                 content: content, contentLength: content.reduce((acc, val) => acc + val.text.length, 0),
                                 isLocked: false, storagePath: itemPath, ocrStatus: ocrStatus,
                             };
-
+                        } else if (itemName.toLowerCase().endsWith('.docx')) {
+                            const response = await fetch(downloadURL);
+                            const arrayBuffer = await response.arrayBuffer();
+                            // We need a File-like blob or just the arrayBuffer for mammoth
+                            const text = await extractTextFromDocx(new File([arrayBuffer], itemName));
+                            const content = [{ name: 'Document Content', text }];
+                            newFileMetadata = {
+                                id: newId, name: itemName, type: 'docx', folderId: 'root',
+                                content, contentLength: text.length,
+                                isLocked: false, storagePath: itemPath, ocrStatus: 'text_only'
+                            };
+                        } else if (itemName.toLowerCase().endsWith('.txt')) {
+                            const response = await fetch(downloadURL);
+                            const text = await response.text();
+                            const content = [{ name: 'Text Content', text }];
+                            newFileMetadata = {
+                                id: newId, name: itemName, type: 'text', folderId: 'root',
+                                content, contentLength: text.length,
+                                isLocked: false, storagePath: itemPath, ocrStatus: 'text_only'
+                            };
                         } else {
                             stats.skipped++;
                             continue;

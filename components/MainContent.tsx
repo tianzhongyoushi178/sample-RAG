@@ -44,7 +44,7 @@ export const MainContent: React.FC<MainContentProps> = ({ file, onFileDelete, se
 
 
 
-  if (file.type === 'image') {
+  if (file.type === 'image' || file.type === 'text' || file.type === 'docx') {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden">
         <div className="flex-shrink-0 bg-white border-b border-gray-200 rounded-t-lg p-2 flex items-center justify-between gap-4 sticky top-0 z-10">
@@ -74,14 +74,18 @@ export const MainContent: React.FC<MainContentProps> = ({ file, onFileDelete, se
           </div>
         </div>
         <div className="flex-1 overflow-auto p-4 flex flex-col items-center bg-gray-50">
-          <div className="bg-white rounded-lg p-2 shadow-sm border border-gray-200 max-w-full">
-            <img src={file.url} alt={file.name} className="max-w-full max-h-[70vh] object-contain" />
-          </div>
+          {file.type === 'image' && file.url && (
+            <div className="bg-white rounded-lg p-2 shadow-sm border border-gray-200 max-w-full mb-6">
+              <img src={file.url} alt={file.name} className="max-w-full max-h-[70vh] object-contain" />
+            </div>
+          )}
 
-          <div className="mt-6 w-full max-w-3xl bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-semibold text-sky-600 mb-2 uppercase tracking-wider">AI認識テキスト (OCR)</h3>
-            <div className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed bg-gray-50 p-3 rounded border border-gray-200">
-              {file.content && file.content[0] ? file.content[0].text : "テキストが検出されませんでした。"}
+          <div className="w-full max-w-3xl bg-white rounded-lg p-6 border border-gray-200 shadow-sm min-h-full">
+            <h3 className="text-sm font-semibold text-sky-600 mb-4 uppercase tracking-wider border-b border-gray-100 pb-2">
+              {file.type === 'image' ? 'AI認識テキスト (OCR)' : file.type === 'docx' ? 'DOCX 抽出テキスト' : 'テキスト内容'}
+            </h3>
+            <div className="text-gray-700 text-base whitespace-pre-wrap leading-relaxed">
+              {file.content && file.content[0] ? file.content[0].text : "テキストが抽出されていません。"}
             </div>
           </div>
         </div>
